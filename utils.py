@@ -7,6 +7,13 @@ from urllib.parse import urlparse
 import nltk
 from nltk.corpus import stopwords
 
+# For Vercel/serverless environments, download data to /tmp and ensure NLTK can find it.
+import os
+NLTK_DATA_DIR = "/tmp/nltk_data"
+if not os.path.exists(NLTK_DATA_DIR):
+    os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+nltk.data.path.append(NLTK_DATA_DIR)
+
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_FILE = BASE_DIR / "model.pkl"
@@ -66,8 +73,8 @@ def ensure_nltk_resources() -> None:
     """Download required NLTK data if it is missing."""
     try:
         stopwords.words("english")
-    except LookupError:
-        nltk.download("stopwords", quiet=True)
+    except (LookupError, OSError):
+        nltk.download("stopwords", download_dir=NLTK_DATA_DIR, quiet=True)
 
 
 def preprocess_text(text: str) -> str:
