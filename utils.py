@@ -63,6 +63,11 @@ FAKE_SIGNAL_TERMS = {
     "scandal",
     "exposed",
     "truth",
+    "hacked",
+    "crimes",
+    "nonsense",
+    "absurd",
+    "declared",
 }
 TRUSTED_NEWS_DOMAINS = {
     "ndtv.com",
@@ -129,7 +134,7 @@ def predict_news(text: str, source_url: str = "") -> dict:
     fake_score = 1 - real_score
 
     # Improved Labeling Logic
-    if 0.45 <= real_score <= 0.55:
+    if 0.48 <= real_score <= 0.52:
         prediction = "UNCERTAIN"
         confidence = max(real_score, fake_score)
     else:
@@ -173,11 +178,15 @@ def compute_heuristic_adjustment(text: str, source_url: str) -> tuple[float, str
         reasons.append(f"trusted source domain: {domain}")
 
     if real_hits:
-        adjustment += min(real_hits * 0.02, 0.12)
+        adjustment += min(real_hits * 0.05, 0.20)
         reasons.append(f"real-news signals: {real_hits}")
 
     if fake_hits:
-        adjustment -= min(fake_hits * 0.03, 0.18)
+        # Stronger penalty for fake signals, especially if no real signals are present
+        penalty = min(fake_hits * 0.12, 0.40)
+        if not real_hits:
+            penalty += 0.10  # Additional penalty if it sounds sensational without any official markers
+        adjustment -= penalty
         reasons.append(f"fake-news signals: {fake_hits}")
 
     reason = ", ".join(reasons) if reasons else "model prediction only"
