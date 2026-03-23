@@ -55,6 +55,14 @@ FAKE_SIGNAL_TERMS = {
     "rumor",
     "rumour",
     "viral",
+    "war",
+    "attack",
+    "killed",
+    "dead",
+    "emergency",
+    "scandal",
+    "exposed",
+    "truth",
 }
 TRUSTED_NEWS_DOMAINS = {
     "ndtv.com",
@@ -120,8 +128,13 @@ def predict_news(text: str, source_url: str = "") -> dict:
     real_score = min(max(real_score + heuristic_adjustment, 0.01), 0.99)
     fake_score = 1 - real_score
 
-    prediction = "REAL" if real_score >= fake_score else "FAKE"
-    confidence = real_score if prediction == "REAL" else fake_score
+    # Improved Labeling Logic
+    if 0.45 <= real_score <= 0.55:
+        prediction = "UNCERTAIN"
+        confidence = max(real_score, fake_score)
+    else:
+        prediction = "REAL" if real_score > fake_score else "FAKE"
+        confidence = real_score if prediction == "REAL" else fake_score
 
     return {
         "label": prediction,

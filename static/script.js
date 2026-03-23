@@ -46,10 +46,21 @@ function showError(message) {
 
 function showResult(data) {
     const label = data.label.toUpperCase();
-    const resultClass = label === "REAL" ? "real" : "fake";
+    let resultClass, labelColor;
+
+    if (label === "REAL") {
+        resultClass = "real";
+        labelColor = "#1c9c63";
+    } else if (label === "FAKE") {
+        resultClass = "fake";
+        labelColor = "#d64545";
+    } else {
+        resultClass = "uncertain";
+        labelColor = "#d97706";
+    }
 
     predictionText.textContent = label;
-    predictionText.style.color = label === "REAL" ? "#1c9c63" : "#d64545";
+    predictionText.style.color = labelColor;
     confidenceText.textContent = `${data.confidence}%`;
     articleTitle.textContent = data.title || "Untitled Article";
     wordCount.textContent = data.word_count;

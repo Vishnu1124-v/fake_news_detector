@@ -44,6 +44,8 @@ def predict():
             article_text = article["text"]
             source = "url"
         else:
+            if len(text.split()) < 20:
+                return jsonify({"error": "The provided text is too short for a reliable analysis. Please provide at least 20 words."}), 400
             article = {"title": "Manual Text Input", "text": text}
             article_text = text
             source = "text"
